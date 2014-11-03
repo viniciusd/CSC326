@@ -1,0 +1,125 @@
+Bottle v0.12.7 server starting up (using WSGIRefServer())...
+Listening on http://172.31.62.94:80/
+Hit Ctrl-C to quit.
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 3110, in run
+    server.run(app)
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 2768, in run
+    srv = make_server(self.host, self.port, app, server_cls, handler_cls)
+  File "/usr/lib/python2.7/wsgiref/simple_server.py", line 144, in make_server
+    server = server_class((host, port), handler_class)
+  File "/usr/lib/python2.7/SocketServer.py", line 419, in __init__
+    self.server_bind()
+  File "/usr/lib/python2.7/wsgiref/simple_server.py", line 48, in server_bind
+    HTTPServer.server_bind(self)
+  File "/usr/lib/python2.7/BaseHTTPServer.py", line 108, in server_bind
+    SocketServer.TCPServer.server_bind(self)
+  File "/usr/lib/python2.7/SocketServer.py", line 430, in server_bind
+    self.socket.bind(self.server_address)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 98] Address already in use
+Bottle v0.12.7 server starting up (using WSGIRefServer())...
+Listening on http://172.31.62.94:80/
+Hit Ctrl-C to quit.
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 3110, in run
+    server.run(app)
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 2768, in run
+    srv = make_server(self.host, self.port, app, server_cls, handler_cls)
+  File "/usr/lib/python2.7/wsgiref/simple_server.py", line 144, in make_server
+    server = server_class((host, port), handler_class)
+  File "/usr/lib/python2.7/SocketServer.py", line 419, in __init__
+    self.server_bind()
+  File "/usr/lib/python2.7/wsgiref/simple_server.py", line 48, in server_bind
+    HTTPServer.server_bind(self)
+  File "/usr/lib/python2.7/BaseHTTPServer.py", line 108, in server_bind
+    SocketServer.TCPServer.server_bind(self)
+  File "/usr/lib/python2.7/SocketServer.py", line 430, in server_bind
+    self.socket.bind(self.server_address)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 98] Address already in use
+Bottle v0.12.7 server starting up (using WSGIRefServer())...
+Listening on http://172.31.62.94:80/
+Hit Ctrl-C to quit.
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 3110, in run
+    server.run(app)
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 2768, in run
+    srv = make_server(self.host, self.port, app, server_cls, handler_cls)
+  File "/usr/lib/python2.7/wsgiref/simple_server.py", line 144, in make_server
+    server = server_class((host, port), handler_class)
+  File "/usr/lib/python2.7/SocketServer.py", line 419, in __init__
+    self.server_bind()
+  File "/usr/lib/python2.7/wsgiref/simple_server.py", line 48, in server_bind
+    HTTPServer.server_bind(self)
+  File "/usr/lib/python2.7/BaseHTTPServer.py", line 108, in server_bind
+    SocketServer.TCPServer.server_bind(self)
+  File "/usr/lib/python2.7/SocketServer.py", line 430, in server_bind
+    self.socket.bind(self.server_address)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 98] Address already in use
+Bottle v0.12.7 server starting up (using WSGIRefServer())...
+Listening on http://172.31.62.94:80/
+Hit Ctrl-C to quit.
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 3110, in run
+    server.run(app)
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 2768, in run
+    srv = make_server(self.host, self.port, app, server_cls, handler_cls)
+  File "/usr/lib/python2.7/wsgiref/simple_server.py", line 144, in make_server
+    server = server_class((host, port), handler_class)
+  File "/usr/lib/python2.7/SocketServer.py", line 419, in __init__
+    self.server_bind()
+  File "/usr/lib/python2.7/wsgiref/simple_server.py", line 48, in server_bind
+    HTTPServer.server_bind(self)
+  File "/usr/lib/python2.7/BaseHTTPServer.py", line 108, in server_bind
+    SocketServer.TCPServer.server_bind(self)
+  File "/usr/lib/python2.7/SocketServer.py", line 430, in server_bind
+    self.socket.bind(self.server_address)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 98] Address already in use
+Bottle v0.12.7 server starting up (using WSGIRefServer())...
+Listening on http://172.31.62.94:80/
+Hit Ctrl-C to quit.
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 3110, in run
+    server.run(app)
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 2768, in run
+    srv = make_server(self.host, self.port, app, server_cls, handler_cls)
+  File "/usr/lib/python2.7/wsgiref/simple_server.py", line 144, in make_server
+    server = server_class((host, port), handler_class)
+  File "/usr/lib/python2.7/SocketServer.py", line 419, in __init__
+    self.server_bind()
+  File "/usr/lib/python2.7/wsgiref/simple_server.py", line 48, in server_bind
+    HTTPServer.server_bind(self)
+  File "/usr/lib/python2.7/BaseHTTPServer.py", line 108, in server_bind
+    SocketServer.TCPServer.server_bind(self)
+  File "/usr/lib/python2.7/SocketServer.py", line 430, in server_bind
+    self.socket.bind(self.server_address)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 98] Address already in use
+Traceback (most recent call last):
+  File "Lab2.py", line 10, in <module>
+    from bottle import route, run, template, Bottle, request, static_file, redirect, app
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 3702, in <module>
+    app.push()
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 2211, in push
+    value = Bottle()
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 586, in __init__
+    self.config = ConfigDict()
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 2072, in __init__
+    self._meta = {}
+  File "/usr/local/lib/python2.7/dist-packages/bottle.py", line 2177, in __setattr__
+    return dict.__setattr__(self, key, value)
+KeyboardInterrupt
+hibye
