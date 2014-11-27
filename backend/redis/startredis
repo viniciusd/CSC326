@@ -1,0 +1,4 @@
+#! /usr/bin/zsh
+# The script needs chmod 755, at least!
+
+sudo screen -d -m "~/CSC326/backend/redis/redis-3.0/src/redis-server"
