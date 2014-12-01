@@ -24,12 +24,10 @@ import urlparse
 from BeautifulSoup import *
 from collections import defaultdict
 import re
-
-import time
-
-# For database...
-import redis
-import MySQLdb as mysql
+import pymongo as mongo
+# Just in case:
+from bson.objectid import ObjectId
+from time import sleep
 
 def attr(elem, attr):
     """An html attribute from an html element. E.g. <a href="">, then
@@ -52,18 +50,13 @@ class crawler(object):
 		self._url_queue = [ ]
 		self._doc_id_cache = { }
 		self._word_id_cache = { }
+		self.client = mongo.MongoClient('mongodb://CSC326:programminglanguages@ds043200.mongolab.com:43200/searchengine')
+		self.db = self.client['searchengine']
+		self.lexicon = self.db['lexicon']
+		self.documents = self.db['documents']
+		self.links = self.db['links']
+		self.content = self.db['content']
 
-		self._curr_links = []
-
-		# Our Redis cache layer
-		self.r = redis.StrictRedis(host='104.131.174.43', port=6379, db=0)
-		
-		# Our MySQL database
-		self.db=mysql.connect(host='127.0.0.1', user="root",passwd="programminglanguages",db="CSC326")
-		self.c = self.db.cursor()
-		self._tables = ["`content`", "`documents`", "`lexicon`", "`links`"]
-		for t in self._tables:
-			self.c.execute("TRUNCATE "+t)	
 		# functions to call when entering and exiting specific tags
 		self._enter = defaultdict(lambda *a, **ka: self._visit_ignore)
 		self._exit = defaultdict(lambda *a, **ka: self._visit_ignore)
@@ -133,27 +126,22 @@ class crawler(object):
     
 	def word_id(self, word):
 		"""Get the word id of some specific word."""
+		word_id = self.lexicon.find_one({'word': word})
 		if word in self._word_id_cache:
 			return self._word_id_cache[word]
-		wid = self.db.cursor()
-		wid.execute("INSERT IGNORE INTO `lexicon` (`word`) VALUES ('"+word+"')")
-		wid.execute("SELECT `id` FROM `lexicon` WHERE `word`='"+word+"'")
-		word_id = wid.fetchone()[0]
+		elif word_id == None:
+			word_id = self.lexicon.insert({'word' : word })
 		self._word_id_cache[word] = word_id
-		self.r.set('word:'+str(word_id), word)
 		return word_id
-
+    
 	def document_id(self, url):
 		"""Get the document id for some url."""
+		doc_id = self.documents.find_one({'url': url})
 		if url in self._doc_id_cache:
 			return self._doc_id_cache[url]
-		did = self.db.cursor()	
-		did.execute("INSERT IGNORE INTO `documents` (`url`) VALUES ('"+url+"')")
-		while not did.execute("SELECT `id` FROM `documents` WHERE `url`=%s", (url,)):
-			time.sleep(0.1)
-		doc_id = did.fetchone()[0]
+		elif doc_id == None:
+			doc_id = self.documents.insert({'url': url})
 		self._doc_id_cache[url] = doc_id
-		self.r.set('doc:'+str(doc_id), url)
 		return doc_id
 
 	def _fix_url(self, curr_url, rel):
@@ -172,26 +160,25 @@ class crawler(object):
 	def add_link(self, from_doc_id, to_doc_id):
 		"""Add a link into the database, or increase the number of links between
 		two pages in the database."""
-		if len(self._curr_links) == 0:
-			self._curr_links.append([from_doc_id, to_doc_id,1])
-			return
-		for i, links in enumerate(self._curr_links):
-			if links[0] == from_doc_id and links[1] == to_doc_id:
-				break
-		if links[0] != from_doc_id or links[1] != to_doc_id:
-			self._curr_links.append([from_doc_id, to_doc_id,1])
-		else:
-			self._curr_links[i][2] += 1
 
-	def _send_connections(self):
-		cid = self.db.cursor()	
-		cid.executemany("INSERT INTO `links` (`from`, `to`, `n`) VALUES (%s, %s, %s)", self._curr_links )
+		entry = self.links.find_one({'from': str(from_doc_id), 'to': str(to_doc_id)})
+		if entry == None:
+			self.links.insert({'from': str(from_doc_id), 'to': str(to_doc_id), 'n': 1})
+		else:
+			entry['n'] += 1
+			self.links.update({'_id': entry['_id']}, entry, upsert=False)
 
 	def _visit_title(self, elem):
 		"""Called when visiting the <title> tag."""
 		title_text = self._text_of(elem).strip()
 		print "document title="+ repr(title_text)
-		self.c.execute("UPDATE `documents` SET `title`=%s WHERE `id`=%s", (title_text, self._curr_doc_id))
+		entry = self.documents.find_one({'_id': self._curr_doc_id})
+		# There is some latency between inserting the doc_id and it really get inserted, this instruction is only for safety
+		while entry == None:
+			sleep(1)
+			entry = self.documents.find_one({'_id': self._curr_doc_id})
+		entry['title'] = title_text
+		self.links.update({'_id': entry['_id']}, entry, upsert=False)
 	
 	def _visit_a(self, elem):
 		"""Called when visiting <a> tags."""
@@ -217,9 +204,13 @@ class crawler(object):
 	#       font sizes (in self._curr_words), add all the words into the
 	#       database for this document
 		print "    num words="+ str(len(self._curr_words))
-		cid = self.db.cursor()
-		cid.executemany("INSERT INTO `content` (`doc_id`, `word_id`, `font_size`) VALUES ('"+str(self._curr_doc_id)+"', %s, %s)", self._curr_words )	
-	
+		#entry = self.documents.find_one({'_id': self._curr_doc_id})
+		#entry['words'] = [{'id': str(x[0]), 'font_size': x[1]} for x in self._curr_words]
+		# Ok, let us do something not that good for now
+		# TODO: Improve this part of the code
+		#self.documents.update({'_id': entry['_id']}, entry, upsert=False)
+		for x in self._curr_words:
+			self.content.insert({'doc_id': str(self._curr_doc_id), 'word': str(x[0]), 'font_size': x[1]})
 	def _increase_font_factor(self, factor):
 		"""Increase/decrease the current font size."""
 		def increase_it(elem):
@@ -251,23 +242,23 @@ class crawler(object):
 
 	def get_inverted_index(self):
 		k = {}
-		gidc = self.db.cursor()
-		gidc.execute("SELECT `word_id`, `doc_id` FROM `content`")
-		for word in self.lexicon.fetchone():
-			if not word[0] in k:
-				k[word[0]] = set(word[1])
-			else:
-				k[word[0]].update({word[1]})
+		for word in self.lexicon.find():
+			s = set()
+			for page in self.content.find({'word' : str(word['_id'])}):
+				s.update({page['doc_id']})
+			k[str(word['_id'])] = s
 		return k
 
 	def get_resolved_inverted_index(self):
 		k = {}
 		k2 = self.get_inverted_index()
 		for key in k2:
+			ret = self.lexicon.find_one({'_id': ObjectId(key)})
 			s = set()
 			for v in k2[key]:
-				s.update({r.get('doc:'+str(v))})
-			k[r.get('word:'+str(key))] = s
+				val = self.documents.find_one({'_id': ObjectId(v)})
+				s.update({val['url']})
+			k[ret['word']] = s
 		return k
 
 	def _index_document(self, soup):
@@ -324,22 +315,22 @@ class crawler(object):
 				continue
 			doc_id = self.document_id(url)	
 			# we've already seen this document
-			if doc_id in seen:
+			if str(doc_id) in seen:
 				continue	
-			seen.add(doc_id) # mark this document as haven't been visited
+			#k = str(raw_input())
+			seen.add(str(doc_id)) # mark this document as haven't been visited
 			socket = None
 			try:
 				socket = urllib2.urlopen(url, timeout=timeout)
 				soup = BeautifulSoup(socket.read())
+
 				self._curr_depth = depth_ + 1
 				self._curr_url = url
 				self._curr_doc_id = doc_id
 				self._font_size = 0
 				self._curr_words = [ ]
-				self._curr_links = []
 				self._index_document(soup)
 				self._add_words_to_document()
-				self._send_connections()
 				print "    url="+repr(self._curr_url)
 
 			except Exception as e:

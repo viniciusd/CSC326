@@ -19,7 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import pymongo as mongo
+import redis
+import MySQLdb as mysql
 
 def page_rank(links, num_iterations=20, initial_pr=1.0):
     from collections import defaultdict
@@ -55,18 +56,16 @@ def page_rank(links, num_iterations=20, initial_pr=1.0):
     return page_rank
 
 if __name__ == "__main__":
-	client = mongo.MongoClient('mongodb://CSC326:programminglanguages@ds043200.mongolab.com:43200/searchengine')
-	db = client['searchengine']
-	#lexicon = self.db['lexicon']
-	#documents = self.db['documents']
-	links = db['links']
-	rank = db['rank']
-	#content = self.db['content']
+	r = redis.StrictRedis(host='104.131.174.43', port=6379, db=0)
+
+	db=mysql.connect(host='127.0.0.1', user="root",passwd="programminglanguages",db="CSC326")
+	c = db.cursor()
+	c.execute("TRUNCATE `rank`")
 	l = []
-	for conn in links.find():
-		l.append((conn['from'], conn['to']))
+	c.execute("SELECT `from`, `to` FROM `links`")
+	for conn in c.fetchone():
+		l.append(conn)
 	for (id, v) in page_rank(l).viewitems():
 		print('Inserting {0}...'.format((id)))
-		rank.insert({'page': id, 'rank': v})
-	#print page_rank([(1,2), (2, 4), (4, 3)])
-	#print page_rank([(1,2), (2, 4), (4), (3, 1), (3, 2)])
+		c.execute("INSERT INTO `rank` (`page`, `rank`) VALUES (%s, %s)", (id, v))
+		r.set("page:"+str(id), v)
