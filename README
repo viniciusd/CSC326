@@ -1,2 +1,7 @@
 The page is hosted at http://viniciusdantas.me
 
+The code is divided in two folders:
+* frontend: which contain all the frontend files, including the script that runs the web server
+
+* backend: which contain all the backend files, including crawler and pagerank algorithms, mysql structure file and redis.
+
